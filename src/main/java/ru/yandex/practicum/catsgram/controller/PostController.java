@@ -8,7 +8,6 @@ import ru.yandex.practicum.catsgram.service.PostService;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/posts")
 public class PostController {
 
     private final PostService postService;
@@ -18,17 +17,17 @@ public class PostController {
         this.postService = postService;
     }
 
-    @GetMapping
-    public Collection<Post> findAll() {
-        return postService.findAll();
+    @GetMapping({"/posts", "/posts/{id}"})
+    public Collection<Post> getPost(@PathVariable(required = false) Long id) {
+        return id != null ? postService.findById(id) : postService.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/posts")
     public Post create(@RequestBody Post post) {
         return postService.create(post);
     }
 
-    @PutMapping
+    @PutMapping("/posts")
     public Post update(@RequestBody Post newPost) {
         return postService.update(newPost);
     }

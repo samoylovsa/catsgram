@@ -7,6 +7,7 @@ import ru.yandex.practicum.catsgram.model.Post;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +17,13 @@ public class PostService {
 
     public Collection<Post> findAll() {
         return posts.values();
+    }
+
+    public Collection<Post> findById(Long id) {
+        if (!posts.containsKey(id)) {
+            throw new NotFoundException("Не найден пост с id: " + id);
+        }
+        return Collections.singletonList(posts.get(id));
     }
 
     public Post create(Post post) {
