@@ -8,7 +8,6 @@ import ru.yandex.practicum.catsgram.service.UserService;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
@@ -18,17 +17,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public Collection<User> getUsers() {
-        return userService.findAll();
+    @GetMapping({"/users", "/users/{id}"})
+    public Collection<User> getUser(@PathVariable(required = false) Long id) {
+        return id != null ? userService.findById(id) : userService.findAll();
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public User createUser(@RequestBody User user) {
         return userService.create(user);
     }
 
-    @PutMapping
+    @PutMapping("/users")
     public User updateUser(@RequestBody User user) {
         return userService.update(user);
     }

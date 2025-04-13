@@ -3,10 +3,12 @@ package ru.yandex.practicum.catsgram.service;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
+import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +19,13 @@ public class UserService {
 
     public Collection<User> findAll() {
         return users.values();
+    }
+
+    public Collection<User> findById(Long id) {
+        if (!users.containsKey(id)) {
+            throw new NotFoundException("Не найден пользователь с id: " + id);
+        }
+        return Collections.singletonList(users.get(id));
     }
 
     public User create(User user) {
