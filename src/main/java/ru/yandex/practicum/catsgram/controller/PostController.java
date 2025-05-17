@@ -3,7 +3,7 @@ package ru.yandex.practicum.catsgram.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
+import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
 
@@ -36,15 +36,18 @@ public class PostController {
         int actualSize = (size == null) ? 10 : size;
 
         if (!"asc".equalsIgnoreCase(actualSort) && !"desc".equalsIgnoreCase(actualSort)) {
-            throw new ConditionsNotMetException("Параметр sort должен быть 'asc' или 'desc'");
+            throw new ParameterNotValidException(sort,
+                    "Параметр sort должен быть 'asc' или 'desc'");
         }
 
         if (actualFrom < 0) {
-            throw new ConditionsNotMetException("Параметр from не может быть отрицательным");
+            throw new ParameterNotValidException(String.valueOf(from),
+                    "Параметр from не может быть отрицательным");
         }
 
         if (actualSize <= 0) {
-            throw new ConditionsNotMetException("Параметр size должен быть больше нуля");
+            throw new ParameterNotValidException(String.valueOf(size),
+                    "Некорректный размер выборки. Размер должен быть больше нуля");
         }
 
         return postService.findAll(actualSort, actualFrom, actualSize);
