@@ -3,9 +3,9 @@ package ru.yandex.practicum.catsgram.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.catsgram.dto.NewUserRequest;
-import ru.yandex.practicum.catsgram.dto.UpdateUserRequest;
-import ru.yandex.practicum.catsgram.dto.UserDto;
+import ru.yandex.practicum.catsgram.dto.user.NewUserRequest;
+import ru.yandex.practicum.catsgram.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.catsgram.dto.user.UserDto;
 import ru.yandex.practicum.catsgram.service.UserService;
 
 import java.util.List;

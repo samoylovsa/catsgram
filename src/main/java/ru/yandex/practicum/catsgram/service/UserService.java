@@ -3,23 +3,22 @@ package ru.yandex.practicum.catsgram.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.catsgram.dal.UserRepository;
-import ru.yandex.practicum.catsgram.dto.NewUserRequest;
-import ru.yandex.practicum.catsgram.dto.UpdateUserRequest;
-import ru.yandex.practicum.catsgram.dto.UserDto;
+import ru.yandex.practicum.catsgram.dto.user.NewUserRequest;
+import ru.yandex.practicum.catsgram.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.catsgram.dto.user.UserDto;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.DuplicatedDataException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
 import ru.yandex.practicum.catsgram.mapper.UserMapper;
 import ru.yandex.practicum.catsgram.model.User;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    private final Map<Long, User> users = new HashMap<>();
     private final UserRepository userRepository;
 
     @Autowired
@@ -38,13 +37,6 @@ public class UserService {
         return userRepository.findById(userId)
                 .map(UserMapper::mapToUserDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден с ID: " + userId));
-    }
-
-    public Collection<User> findById(Long id) {
-        if (!users.containsKey(id)) {
-            throw new NotFoundException("Не найден пользователь с id: " + id);
-        }
-        return Collections.singletonList(users.get(id));
     }
 
     public UserDto createUser(NewUserRequest request) {
@@ -70,14 +62,5 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
         updatedUser = userRepository.update(updatedUser);
         return UserMapper.mapToUserDto(updatedUser);
-    }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }

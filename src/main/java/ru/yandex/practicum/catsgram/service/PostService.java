@@ -1,19 +1,31 @@
 package ru.yandex.practicum.catsgram.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.catsgram.dal.PostRepository;
+import ru.yandex.practicum.catsgram.dto.post.NewPostRequest;
+import ru.yandex.practicum.catsgram.dto.post.PostDto;
+import ru.yandex.practicum.catsgram.dto.post.UpdatePostRequest;
 import ru.yandex.practicum.catsgram.exception.ConditionsNotMetException;
 import ru.yandex.practicum.catsgram.exception.NotFoundException;
+import ru.yandex.practicum.catsgram.mapper.PostMapper;
 import ru.yandex.practicum.catsgram.model.Post;
 
-import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PostService {
-    private final Map<Long, Post> posts = new HashMap<>();
 
-    public Collection<Post> findAll(String sort, Integer from, Integer size) {
-        List<Post> postsList = new ArrayList<>(posts.values());
+    private final PostRepository postRepository;
+
+    @Autowired
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
+
+    public Collection<PostDto> getPosts(String sort, Integer from, Integer size) {
+        List<Post> postsList = postRepository.findAll();
 
         if (postsList.isEmpty()) {
             return Collections.emptyList();
@@ -33,48 +45,41 @@ public class PostService {
             return Collections.emptyList();
         }
 
-        return new ArrayList<>(postsList.subList(start, end));
+        return postsList.subList(start, end).stream()
+                .map(PostMapper::mapToPostDto)
+                .collect(Collectors.toList());
     }
 
-    public Post findById(Long id) {
-        if (!posts.containsKey(id)) {
-            throw new NotFoundException("Не найден пост с id: " + id);
+    public PostDto getPostById(Long postId) {
+        return postRepository.findById(postId)
+                .map(PostMapper::mapToPostDto)
+                .orElseThrow(() -> new NotFoundException("Не найден пост с postId: " + postId));
+    }
+
+    public PostDto create(NewPostRequest request) {
+        if (request.getDescription() == null || request.getDescription().isBlank()) {
+            throw new ConditionsNotMetException("Описание не может быть пустым");
         }
-        return posts.get(id);
+        Post post = PostMapper.mapToPost(request);
+        post = postRepository.save(post);
+
+        return PostMapper.mapToPostDto(post);
     }
 
-    public Post create(Post post) {
-        if (post.getDescription() == null || post.getDescription().isBlank()) {
+    public PostDto update(UpdatePostRequest request) {
+        if (request.getId() == null) {
+            throw new ConditionsNotMetException("Id должен быть указан");
+        }
+        if (request.getDescription() == null || request.getDescription().isBlank()) {
             throw new ConditionsNotMetException("Описание не может быть пустым");
         }
 
-        post.setId(getNextId());
-        post.setPostDate(Instant.now());
-        posts.put(post.getId(), post);
-        return post;
-    }
+        Post updatedPost = postRepository.findById(request.getId())
+                .map(post -> PostMapper.updatePostFields(post, request))
+                .orElseThrow(() -> new NotFoundException("Пост с id = " + request.getId() + " не найден"));
 
-    public Post update(Post newPost) {
-        if (newPost.getId() == null) {
-            throw new ConditionsNotMetException("Id должен быть указан");
-        }
-        if (posts.containsKey(newPost.getId())) {
-            Post oldPost = posts.get(newPost.getId());
-            if (newPost.getDescription() == null || newPost.getDescription().isBlank()) {
-                throw new ConditionsNotMetException("Описание не может быть пустым");
-            }
-            oldPost.setDescription(newPost.getDescription());
-            return oldPost;
-        }
-        throw new NotFoundException("Пост с id = " + newPost.getId() + " не найден");
-    }
+        updatedPost = postRepository.update(updatedPost);
 
-    private long getNextId() {
-        long currentMaxId = posts.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
+        return PostMapper.mapToPostDto(updatedPost);
     }
 }

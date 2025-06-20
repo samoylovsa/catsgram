@@ -2,9 +2,9 @@ package ru.yandex.practicum.catsgram.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.yandex.practicum.catsgram.dto.NewUserRequest;
-import ru.yandex.practicum.catsgram.dto.UpdateUserRequest;
-import ru.yandex.practicum.catsgram.dto.UserDto;
+import ru.yandex.practicum.catsgram.dto.user.NewUserRequest;
+import ru.yandex.practicum.catsgram.dto.user.UpdateUserRequest;
+import ru.yandex.practicum.catsgram.dto.user.UserDto;
 import ru.yandex.practicum.catsgram.model.User;
 
 import java.time.Instant;
@@ -26,7 +26,7 @@ public final class UserMapper {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        dto.setRegistrationDate(Instant.now());
+        dto.setRegistrationDate(user.getRegistrationDate());
         return dto;
     }
 

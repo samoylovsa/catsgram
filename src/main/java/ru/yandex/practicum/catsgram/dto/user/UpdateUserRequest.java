@@ -1,4 +1,4 @@
-package ru.yandex.practicum.catsgram.dto;
+package ru.yandex.practicum.catsgram.dto.user;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.catsgram.dto;
+package ru.yandex.practicum.catsgram.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,11 +6,11 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class UserDto {
+public class PostDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private long id;
-    private String username;
-    private String email;
+    private Long id;
+    private long authorId;
+    private String description;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Instant registrationDate;
+    private Instant postDate;
 }

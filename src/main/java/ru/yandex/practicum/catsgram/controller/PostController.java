@@ -3,8 +3,10 @@ package ru.yandex.practicum.catsgram.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.catsgram.dto.post.NewPostRequest;
+import ru.yandex.practicum.catsgram.dto.post.PostDto;
+import ru.yandex.practicum.catsgram.dto.post.UpdatePostRequest;
 import ru.yandex.practicum.catsgram.exception.ParameterNotValidException;
-import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
 
 import java.util.Collection;
@@ -21,14 +23,14 @@ public class PostController {
     }
 
     @GetMapping({"/posts", "/posts/{id}"})
-    public Collection<Post> getPost(
+    public Collection<PostDto> getPost(
             @PathVariable(required = false) Long id,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) Integer from,
             @RequestParam(required = false) Integer size
     ) {
         if (id != null) {
-            return Collections.singletonList(postService.findById(id));
+            return Collections.singletonList(postService.getPostById(id));
         }
 
         String actualSort = (sort == null) ? "desc" : sort;
@@ -50,17 +52,17 @@ public class PostController {
                     "Некорректный размер выборки. Размер должен быть больше нуля");
         }
 
-        return postService.findAll(actualSort, actualFrom, actualSize);
+        return postService.getPosts(actualSort, actualFrom, actualSize);
     }
 
     @PostMapping("/posts")
     @ResponseStatus(HttpStatus.CREATED)
-    public Post create(@RequestBody Post post) {
-        return postService.create(post);
+    public PostDto create(@RequestBody NewPostRequest request) {
+        return postService.create(request);
     }
 
     @PutMapping("/posts")
-    public Post update(@RequestBody Post newPost) {
-        return postService.update(newPost);
+    public PostDto update(@RequestBody UpdatePostRequest request) {
+        return postService.update(request);
     }
 }
